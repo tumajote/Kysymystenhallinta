@@ -12,6 +12,6 @@ public class Database {
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(databaseAddress);
+        return getConnection();
     }
 }

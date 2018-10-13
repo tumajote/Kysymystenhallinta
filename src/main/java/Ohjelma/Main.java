@@ -1,6 +1,5 @@
 package Ohjelma;
 
-
 import Dao.AiheDao;
 import Dao.KurssiDao;
 import Dao.KysymysDao;
@@ -24,11 +23,11 @@ public class Main {
         if (System.getenv("PORT") != null) {
             Spark.port(Integer.valueOf(System.getenv("PORT")));
         }
-        
+
         File tiedosto = new File("db", "kysymystietokanta.db");
         Database database = new Database("jdbc:sqlite:" + tiedosto.getAbsolutePath());
 
-        Connection connection = DriverManager.getConnection("jdbc:sqlite:kysymykset.db");
+        Connection connection = getConnection();
 
         Statement statement = connection.createStatement();
 
@@ -42,7 +41,7 @@ public class Main {
         }
 
         KurssiDao kurssiDao = new KurssiDao(database);
-        KysymysDao kysymysDao = new KysymysDao(database);        
+        KysymysDao kysymysDao = new KysymysDao(database);
         AiheDao aiheDao = new AiheDao(database);
         VastausDao vastausDao = new VastausDao(database);
 
@@ -114,4 +113,12 @@ public class Main {
         });
     }
 
+    public static Connection getConnection() throws Exception {
+        String dbUrl = System.getenv("JDBC_DATABASE_URL");
+        if (dbUrl != null && dbUrl.length() > 0) {
+            return DriverManager.getConnection(dbUrl);
+        }
+
+        return DriverManager.getConnection("jdbc:sqlite:kysymykset.db");
+    }
 }
