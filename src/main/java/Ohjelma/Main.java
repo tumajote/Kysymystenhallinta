@@ -99,7 +99,7 @@ public class Main {
         Spark.post("/kysymykset/poista/:id", (req, res) -> {
             Integer kysymys_Id = Integer.parseInt(req.params(":id"));
             kysymysDao.delete(kysymys_Id);
-            res.redirect("/kysymystenhallinta");
+            res.redirect("/");
             return "";
 
         });
