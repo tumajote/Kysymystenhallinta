@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KurssiDao implements Dao<Kurssi, Integer> {
 
@@ -24,7 +26,7 @@ public class KurssiDao implements Dao<Kurssi, Integer> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Kurssi findOneWithNimi(String nimi) throws SQLException {
+    public Kurssi findOneWithNimi(String nimi) throws SQLException, Exception {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Kurssi WHERE kurssi = ? ");
             stmt.setString(1, nimi);
@@ -49,11 +51,13 @@ public class KurssiDao implements Dao<Kurssi, Integer> {
 
             }
 
+        } catch (Exception ex) {
+            Logger.getLogger(KurssiDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return kurssit;
     }
 
-    public ArrayList<Kurssi> getAll() throws SQLException {
+    public ArrayList<Kurssi> getAll() throws SQLException, Exception {
         ArrayList<Kurssi> kurssit = new ArrayList<>();
 
         try (Connection conn = database.getConnection();
@@ -106,12 +110,14 @@ public class KurssiDao implements Dao<Kurssi, Integer> {
                     "INSERT INTO Kurssi (kurssi) VALUES (?)");
             stmt.setString(1, kurssi.getNimi());
             stmt.executeUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(KurssiDao.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;
     }
 
-    public Kurssi findKurssiByAihe(Aihe aihe) throws SQLException {
+    public Kurssi findKurssiByAihe(Aihe aihe) throws SQLException, Exception{
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Kurssi WHERE id = ?");
             stmt.setInt(1, aihe.getKurssi_id());

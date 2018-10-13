@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class VastausDao implements Dao<Vastaus, Integer> {
@@ -29,7 +31,7 @@ public class VastausDao implements Dao<Vastaus, Integer> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public List<Vastaus> findAllByKysymysId(Integer id) throws SQLException {
+    public List<Vastaus> findAllByKysymysId(Integer id) throws SQLException, Exception {
         List<Vastaus> vastaukset = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
@@ -74,6 +76,8 @@ public class VastausDao implements Dao<Vastaus, Integer> {
             stmt.executeUpdate();
 
             
+        } catch (Exception ex) {
+            Logger.getLogger(VastausDao.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;
@@ -81,15 +85,19 @@ public class VastausDao implements Dao<Vastaus, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Vastaus WHERE id = ?");
-
-        stmt.setInt(1, key);
-        stmt.executeUpdate();
+        try {
+            Connection conn = database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM Vastaus WHERE id = ?");
+            
+            stmt.setInt(1, key);
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(VastausDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
       
     }
-       public Vastaus findById(Integer id) throws SQLException {
+       public Vastaus findById(Integer id) throws SQLException, Exception {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Vastaus WHERE id = ?");
             stmt.setInt(1, id);

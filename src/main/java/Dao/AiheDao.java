@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AiheDao implements Dao<Aihe, Integer> {
 
@@ -20,7 +22,7 @@ public class AiheDao implements Dao<Aihe, Integer> {
         this.database = database;
     }
 
-    public Aihe findOneWithNimi(String nimi) throws SQLException {
+    public Aihe findOneWithNimi(String nimi) throws SQLException, Exception {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Aihe WHERE aihe = ? ");
             stmt.setString(1, nimi);
@@ -33,7 +35,7 @@ public class AiheDao implements Dao<Aihe, Integer> {
         }
     }
 
-    public Aihe findAiheByKysymys(Kysymys kysymys) throws SQLException {
+    public Aihe findAiheByKysymys(Kysymys kysymys) throws SQLException, Exception {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Aihe WHERE id = ?");
             stmt.setInt(1, kysymys.getAihe_id());
@@ -47,7 +49,7 @@ public class AiheDao implements Dao<Aihe, Integer> {
         }
     }
 
-    public List<Aihe> findallWithKurssiId(Kurssi kurssi) throws SQLException {
+    public List<Aihe> findallWithKurssiId(Kurssi kurssi) throws SQLException,Exception {
         List<Aihe> aiheet = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
@@ -66,7 +68,7 @@ public class AiheDao implements Dao<Aihe, Integer> {
     }
 
     @Override
-    public Aihe saveOrUpdate(Aihe aihe) throws SQLException {
+    public Aihe saveOrUpdate(Aihe aihe) throws SQLException{
         try (Connection conn = database.getConnection()) {
 
             Aihe nimella = findOneWithNimi(aihe.getNimi());
@@ -80,6 +82,8 @@ public class AiheDao implements Dao<Aihe, Integer> {
             stmt.setString(1, aihe.getNimi());
             stmt.setInt(2, aihe.getKurssi_id());
             stmt.executeUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(AiheDao.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

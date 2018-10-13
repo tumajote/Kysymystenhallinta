@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KysymysDao implements Dao<Kysymys, Integer> {
 
@@ -36,11 +38,13 @@ public class KysymysDao implements Dao<Kysymys, Integer> {
 
             }
             
+        } catch (Exception ex) {
+            Logger.getLogger(KysymysDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return kysymykset;
     }
 
-    public List<Kysymys> findAllWithAiheiId(Aihe aihe) throws SQLException {
+    public List<Kysymys> findAllWithAiheiId(Aihe aihe) throws SQLException, Exception {
         List<Kysymys> kysymykset = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
@@ -70,6 +74,8 @@ public class KysymysDao implements Dao<Kysymys, Integer> {
             stmt.executeUpdate();
 
             
+        } catch (Exception ex) {
+            Logger.getLogger(KysymysDao.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;
@@ -77,16 +83,20 @@ public class KysymysDao implements Dao<Kysymys, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Kysymys WHERE id = ?");
-
-        stmt.setInt(1, key);
-        stmt.executeUpdate();
+        try {
+            Connection conn = database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM Kysymys WHERE id = ?");
+            
+            stmt.setInt(1, key);
+            stmt.executeUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(KysymysDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
       
     }
 
-    public Kysymys findById(Integer id) throws SQLException {
+    public Kysymys findById(Integer id) throws SQLException, Exception {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Kysymys WHERE id = ?");
             stmt.setInt(1, id);
