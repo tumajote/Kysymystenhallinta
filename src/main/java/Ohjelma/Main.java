@@ -24,21 +24,9 @@ public class Main {
             Spark.port(Integer.valueOf(System.getenv("PORT")));
         }
 
-        File tiedosto = new File("db", "kysymystietokanta.db");
-        Database database = new Database("jdbc:sqlite:" + tiedosto.getAbsolutePath());
 
-        Connection connection = getConnection();
+        Database database = new Database("jdbc:sqlite:kysymykset.db");
 
-        Statement statement = connection.createStatement();
-
-        ResultSet resultSet = statement.executeQuery("SELECT 1");
-        HashMap map = new HashMap<>();
-
-        if (resultSet.next()) {
-            System.out.println("Hei tietokantamaailma!");
-        } else {
-            System.out.println("Yhteyden muodostaminen epäonnistui.");
-        }
 
         KurssiDao kurssiDao = new KurssiDao(database);
         KysymysDao kysymysDao = new KysymysDao(database);
@@ -46,6 +34,7 @@ public class Main {
         VastausDao vastausDao = new VastausDao(database);
 
         Spark.get("/", (req, res) -> {
+            HashMap map = new HashMap<>();
             map.put("teksti", "Kysymykset");
             List<Kurssi> kurssit = kurssiDao.getAll();
             map.put("kurssit", kurssit);
@@ -70,17 +59,17 @@ public class Main {
         });
 
         Spark.get("/kysymykset/:id", (req, res) -> {
-            HashMap map2 = new HashMap<>();
+            HashMap map = new HashMap<>();
             Integer kysymysId = Integer.parseInt(req.params(":id"));
             Kysymys kysymys = kysymysDao.findById(kysymysId);
             Aihe aihe = aiheDao.findAiheByKysymys(kysymys);
             Kurssi kurssi = kurssiDao.findKurssiByAihe(aihe);
-            map2.put("kurssi", kurssi);
-            map2.put("aihe", aihe);
-            map2.put("kysymys", kysymys);
-            map2.put("vastaukset", vastausDao.findAllByKysymysId(kysymysId));
+            map.put("kurssi", kurssi);
+            map.put("aihe", aihe);
+            map.put("kysymys", kysymys);
+            map.put("vastaukset", vastausDao.findAllByKysymysId(kysymysId));
 
-            return new ModelAndView(map2, "kysymykset");
+            return new ModelAndView(map, "kysymykset");
         }, new ThymeleafTemplateEngine());
 
         Spark.post("/kysymykset/:id", (req, res) -> {
@@ -113,12 +102,5 @@ public class Main {
         });
     }
 
-    public static Connection getConnection() throws Exception {
-        String dbUrl = System.getenv("JDBC_DATABASE_URL");
-        if (dbUrl != null && dbUrl.length() > 0) {
-            return DriverManager.getConnection(dbUrl);
-        }
-
-        return DriverManager.getConnection("jdbc:sqlite:kysymykset.db");
-    }
+    
 }
