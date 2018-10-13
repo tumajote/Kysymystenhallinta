@@ -1,0 +1,65 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Kysymystenhallinta</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body>
+        <h1 th:text="${teksti}"></h1>
+
+
+        <ul style="list-style: none;">
+            <li th:each="kurssi: ${kurssit}">
+                <h3 th:text="'Kurssi: '+${kurssi.nimi}">1</h3>
+
+                <ul style="list-style: none;">
+                    <li th:each="aihe: ${kurssi.aiheet}">
+                        <h4 th:text="'Aihe: '+${aihe.nimi}"></h4>
+
+                        <ul>
+                            <li th:each="kysymys: ${aihe.kysymykset}">
+                                <div>
+                                    <a th:href="@{~/kysymykset/{id}(id=${kysymys.id})}"><p th:text="${kysymys.kysymysteksti}"></p></a>
+                                    <form th:action="@{~/kysymykset/poista/{id}(id=${kysymys.id})}" method="post"><input type="submit" value="Poista"/></form>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+
+        <h2>Luo uusi kysymys</h2>
+        <form method="POST" action="/lisaaKysymys">
+            <table>
+                <tr>
+                    <td>
+                        Kurssi:
+                    </td>
+                    <td>
+                        <input type="text" name="kurssi" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Aihe:
+                    </td>
+                    <td>
+                        <input type="text" name="aihe" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Kysymysteksti:
+                    </td>
+                    <td>
+                        <input type="text" name="kysymysteksti" required/>
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Luo"/>
+        </form>
+    </body>
+</html>
