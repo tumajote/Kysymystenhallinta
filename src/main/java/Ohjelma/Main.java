@@ -46,7 +46,7 @@ public class Main {
         AiheDao aiheDao = new AiheDao(database);
         VastausDao vastausDao = new VastausDao(database);
 
-        Spark.get("/kysymystenhallinta", (req, res) -> {
+        Spark.get("/", (req, res) -> {
             map.put("teksti", "Kysymykset");
             List<Kurssi> kurssit = kurssiDao.getAll();
             map.put("kurssit", kurssit);
@@ -66,7 +66,7 @@ public class Main {
             Kysymys kysymys = new Kysymys(-1, id, kysymyksenTeksti);
             kysymysDao.saveOrUpdate(kysymys);
             System.out.println("Vastaanotettiin ");
-            res.redirect("/kysymystenhallinta");
+            res.redirect("/");
             return "";
         });
 
