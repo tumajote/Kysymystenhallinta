@@ -44,17 +44,15 @@ public class KysymysDao implements Dao<Kysymys, Integer> {
         return kysymykset;
     }
 
-    public List<Kysymys> findAllWithAiheiId(Aihe aihe) throws SQLException, Exception {
-        List<Kysymys> kysymykset = new ArrayList<>();
+    public ArrayList<Kysymys> findAllWithAiheiId(Aihe aihe) throws SQLException, Exception {
+        ArrayList<Kysymys> kysymykset = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Kysymys WHERE aihe_id = ?");
             stmt.setInt(1, aihe.getId());
 
             ResultSet result = stmt.executeQuery();
-            if (!result.next()) {
-                return null;
-            }
+           
             while (result.next()) {
                 kysymykset.add(new Kysymys(result.getInt("id"), result.getInt("aihe_id"), result.getString("kysymysteksti")));
             }

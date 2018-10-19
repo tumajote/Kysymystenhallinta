@@ -11,6 +11,7 @@ import Domain.Kysymys;
 import Domain.Vastaus;
 import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import spark.ModelAndView;
@@ -24,9 +25,7 @@ public class Main {
             Spark.port(Integer.valueOf(System.getenv("PORT")));
         }
 
-
         Database database = new Database("jdbc:sqlite:kysymykset.db");
-
 
         KurssiDao kurssiDao = new KurssiDao(database);
         KysymysDao kysymysDao = new KysymysDao(database);
@@ -36,8 +35,31 @@ public class Main {
         Spark.get("/", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("teksti", "Kysymykset");
-            List<Kurssi> kurssit = kurssiDao.getAll();
-            map.put("kurssit", kurssit);
+//            List<Kurssi> kurssit = kurssiDao.getAll();
+
+            List<Kurssi> kurssit = kurssiDao.findAll();
+            for (int i = 0; i < kurssit.size(); i++) {
+                ArrayList<Aihe> aiheet = aiheDao.findallWithKurssiId(kurssit.get(i));
+                for (int j = 0; j < aiheet.size(); j++) {
+                    aiheet.get(j).setKysymykset(kysymysDao.findAllWithAiheiId(aiheet.get(j)));
+                }
+                kurssit.get(i).setAiheet(aiheet);
+            }
+
+            List<Kurssi> kurssitKysymyksilla = new ArrayList<>();
+            kurssit.stream().map((kurssi) -> {
+                ArrayList<Aihe> aiheet = kurssi.getAiheet();
+                ArrayList<Aihe> aiheetKysymyksilla = new ArrayList<>();
+                aiheet.stream().filter((aihe) -> (!aihe.getKysymykset().isEmpty())).forEachOrdered((aihe) -> {
+                    aiheetKysymyksilla.add(aihe);
+                });
+                kurssi.setAiheet(aiheetKysymyksilla);
+                return kurssi;
+            }).filter((kurssi) -> (!kurssi.getAiheet().isEmpty())).forEachOrdered((kurssi) -> {
+                kurssitKysymyksilla.add(kurssi);
+            });
+
+            map.put("kurssit", kurssitKysymyksilla);
             return new ModelAndView(map, "index");
         }, new ThymeleafTemplateEngine());
 
@@ -86,6 +108,10 @@ public class Main {
 
         Spark.post("/kysymykset/poista/:id", (req, res) -> {
             Integer kysymys_Id = Integer.parseInt(req.params(":id"));
+            ArrayList<Vastaus> vastaukset = vastausDao.findAllByKysymysId(kysymys_Id);
+            for (Vastaus vastaus : vastaukset) {
+                vastausDao.delete(vastaus.getId());
+            }
             kysymysDao.delete(kysymys_Id);
             res.redirect("/");
             return "";
@@ -102,5 +128,4 @@ public class Main {
         });
     }
 
-    
 }

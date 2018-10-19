@@ -49,16 +49,14 @@ public class AiheDao implements Dao<Aihe, Integer> {
         }
     }
 
-    public List<Aihe> findallWithKurssiId(Kurssi kurssi) throws SQLException,Exception {
-        List<Aihe> aiheet = new ArrayList<>();
+    public ArrayList<Aihe> findallWithKurssiId(Kurssi kurssi) throws SQLException,Exception {
+        ArrayList<Aihe> aiheet = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Aihe WHERE kurssi_id = ? ");
             stmt.setInt(1, kurssi.getId());
             ResultSet result = stmt.executeQuery();
-            if (!result.next()) {
-                return null;
-            }
+           
             while (result.next()) {
                 aiheet.add(new Aihe(result.getInt("id"), result.getInt("kurssi_id"), result.getString("aihe")));
             }

@@ -31,8 +31,8 @@ public class VastausDao implements Dao<Vastaus, Integer> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public List<Vastaus> findAllByKysymysId(Integer id) throws SQLException, Exception {
-        List<Vastaus> vastaukset = new ArrayList<>();
+    public ArrayList<Vastaus> findAllByKysymysId(Integer id) throws SQLException, Exception {
+        ArrayList<Vastaus> vastaukset = new ArrayList<>();
 
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Vastaus WHERE kysymys_id = ?");
